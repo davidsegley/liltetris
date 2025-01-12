@@ -1,0 +1,57 @@
+[gd_scene load_steps=8 format=3 uid="uid://dpug5rmwlley7"]
+
+[ext_resource type="Script" path="res://login/login_screen.gd" id="1_rn7u8"]
+[ext_resource type="Resource" uid="uid://d16gj1pkh7n1v" path="res://login/login_state.tres" id="2_fi0wi"]
+[ext_resource type="PackedScene" uid="uid://c5i8npxpt0n8f" path="res://login/form_username.tscn" id="2_p3yj6"]
+[ext_resource type="Resource" uid="uid://dcnnj076coeqe" path="res://config/game_options.tres" id="3_ud1qm"]
+[ext_resource type="Environment" uid="uid://v45qr82w2byq" path="res://default_enviroment.tres" id="7_ivmcg"]
+[ext_resource type="PackedScene" uid="uid://cjrfj72lbphil" path="res://ui/alert.tscn" id="9_e7wje"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jmrcm"]
+bg_color = Color(0.192157, 0.196078, 0.266667, 1)
+
+[node name="LoginScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_rn7u8")
+state = ExtResource("2_fi0wi")
+game_options = ExtResource("3_ud1qm")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = ExtResource("7_ivmcg")
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="CenterContainer"]
+custom_minimum_size = Vector2(2000, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_jmrcm")
+
+[node name="EnterUsername" parent="CenterContainer/PanelContainer" instance=ExtResource("2_p3yj6")]
+visible = false
+layout_mode = 2
+
+[node name="Alert" parent="." instance=ExtResource("9_e7wje")]
+visible = false
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -742.0
+offset_top = -216.0
+offset_right = -112.0
+offset_bottom = -112.0
+grow_horizontal = 0
+grow_vertical = 0

@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://d4hjedro4npcf"]
+
+[node name="Label" type="Label"]
+offset_right = 336.0
+offset_bottom = 48.0
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 48
+horizontal_alignment = 1
+uppercase = true

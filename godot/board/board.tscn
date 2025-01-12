@@ -1,0 +1,803 @@
+[gd_scene load_steps=58 format=3 uid="uid://blg1aattuuky7"]
+
+[ext_resource type="Script" path="res://board/board.gd" id="1_3ejk8"]
+[ext_resource type="Resource" uid="uid://dcnnj076coeqe" path="res://config/game_options.tres" id="2_32hbf"]
+[ext_resource type="AudioStream" uid="uid://bi57dfgj3rb5q" path="res://assets/music/champloo_ending_looplo_pass.mp3" id="3_sxty2"]
+[ext_resource type="AudioStream" uid="uid://dm6hbfm1cxcri" path="res://assets/music/hatsuyuki.mp3" id="4_d0ijk"]
+[ext_resource type="AudioStream" uid="uid://bg43r44ga0vd" path="res://assets/music/hoshikuzu-no-shita-de.mp3" id="5_jphqe"]
+[ext_resource type="AudioStream" uid="uid://u37bfur28cbq" path="res://assets/music/itsuka-wasureru-toki.mp3" id="6_yf00c"]
+[ext_resource type="AudioStream" uid="uid://cibcxjqw2ybl0" path="res://assets/music/kuro-to-nijiiro.mp3" id="7_xkyde"]
+[ext_resource type="AudioStream" uid="uid://bqd0qtm5ig4kk" path="res://assets/music/soranoiroha.mp3" id="8_7cdry"]
+[ext_resource type="AudioStream" uid="uid://beplyxps41wbf" path="res://assets/music/tabidachi-no-toki.mp3" id="9_51lec"]
+[ext_resource type="AudioStream" uid="uid://co8hdjmc2c4em" path="res://assets/music/wind-of-flower.mp3" id="10_d0vt7"]
+[ext_resource type="Shader" path="res://shaders/animated_stripes.gdshader" id="11_yi6ud"]
+[ext_resource type="Texture2D" uid="uid://b51644gb13dti" path="res://assets/home_24dp.svg" id="12_vmaa7"]
+[ext_resource type="Texture2D" uid="uid://dsv3j5iaq34cb" path="res://assets/pause_24dp.svg" id="13_2ey8q"]
+[ext_resource type="Texture2D" uid="uid://daxg35mopy332" path="res://assets/skip_previous_24dp.svg" id="14_72628"]
+[ext_resource type="Texture2D" uid="uid://cnjv17kqsbhrs" path="res://assets/icons/undo_24dp.svg" id="14_sdphd"]
+[ext_resource type="Texture2D" uid="uid://dpga27nevwxe8" path="res://assets/play_pause_24dp.svg" id="15_nrt7v"]
+[ext_resource type="Texture2D" uid="uid://b45eny7jc7ge0" path="res://assets/skip_next_24dp.svg" id="16_d6vvd"]
+[ext_resource type="PackedScene" uid="uid://bn5oar86niqfy" path="res://shapes/shape.tscn" id="17_icyxd"]
+[ext_resource type="PackedScene" uid="uid://cc263q64lwo6o" path="res://board/grid.tscn" id="18_1leos"]
+[ext_resource type="PackedScene" uid="uid://bdnr8o3m1tg4e" path="res://ui/game_over_screen.tscn" id="19_s082q"]
+[ext_resource type="Script" path="res://board/pause_node.gd" id="20_eq48s"]
+[ext_resource type="Texture2D" uid="uid://d4lofhptvt1cc" path="res://assets/touch_buttons.png" id="21_h8cd0"]
+[ext_resource type="PackedScene" uid="uid://drl34wq25i61m" path="res://ui/help_label.tscn" id="21_kujky"]
+[ext_resource type="Environment" uid="uid://v45qr82w2byq" path="res://default_enviroment.tres" id="22_4y5ig"]
+[ext_resource type="Script" path="res://http_client/api_request.gd" id="24_6ivlf"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0y3cp"]
+bg_color = Color(0.0941176, 0.0941176, 0.145098, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_k63cm"]
+shader = ExtResource("11_yi6ud")
+shader_parameter/color_gap = Color(0.25, 0.25, 0.25, 0.25)
+shader_parameter/color_stripe = Color(0.192157, 0.196078, 0.266667, 1)
+shader_parameter/divisions = 8.0
+shader_parameter/stripe_bias = 2.5
+shader_parameter/speed = 0.02
+shader_parameter/angle = 0.7854
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_q5586"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_0tlm7"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jqn22"]
+bg_color = Color(0.117647, 0.117647, 0.180392, 1)
+border_width_left = 10
+border_width_top = 10
+border_width_right = 10
+border_width_bottom = 10
+border_color = Color(0.345098, 0.356863, 0.439216, 1)
+
+[sub_resource type="Shader" id="Shader_8mlbo"]
+code = "shader_type canvas_item;
+
+// --- Uniforms --- //
+uniform vec4 shine_color: source_color = vec4(1.0, 1.0, 1.0, 0.25);
+
+uniform float line_width: hint_range(0.0, 2.0, 0.01) = 0.1;
+uniform float angle: hint_range(0.0, 6.28318530718, 0.1308996939) = 0.785398163397;
+
+uniform float speed: hint_range(0.0, 10.0, 0.1) = 2.0;
+uniform float wait_cycles: hint_range(0.0, 10.0, 0.1) = 1.0;
+
+// --- Functions --- //
+vec2 rotate_precalculated(vec2 _pos, float _sine, float _cosine) {
+	return vec2(_pos.x * _cosine + _pos.y * -_sine, _pos.x * _sine + _pos.y * _cosine);
+}
+
+void fragment() {
+	float sine = sin(angle);
+	float cosine = cos(angle);
+	float len = 1.5 - max(abs(sine), abs(cosine)) + line_width;
+	float line = smoothstep(-line_width, line_width,
+			rotate_precalculated((UV - vec2(0.5)), sine, cosine).y - mod(TIME * speed, (len * 2.0) * wait_cycles) + len);
+	COLOR.rgb += shine_color.rgb * shine_color.a * vec3(line * (1.0 - line) * 4.0);
+}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_xkv06"]
+resource_local_to_scene = true
+shader = SubResource("Shader_8mlbo")
+shader_parameter/shine_color = Color(1, 1, 1, 0.25)
+shader_parameter/line_width = 0.1
+shader_parameter/angle = 0.785398
+shader_parameter/speed = 1.0
+shader_parameter/wait_cycles = 2.0
+
+[sub_resource type="Gradient" id="Gradient_x57ka"]
+interpolation_mode = 1
+offsets = PackedFloat32Array(0.454874, 0.801444, 1)
+colors = PackedColorArray(1, 1, 1, 1, 0.5, 0.5, 0.5, 1, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_mas8v"]
+gradient = SubResource("Gradient_x57ka")
+fill = 2
+fill_from = Vector2(0.5, 0.5)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_auo2c"]
+bg_color = Color(0.117647, 0.117647, 0.180392, 1)
+border_width_left = 10
+border_width_right = 10
+border_width_bottom = 10
+border_color = Color(0.345098, 0.356863, 0.439216, 1)
+expand_margin_left = 10.0
+expand_margin_right = 10.0
+expand_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xyi2b"]
+bg_color = Color(0.117647, 0.117647, 0.180392, 1)
+border_width_left = 10
+border_width_top = 10
+border_width_right = 10
+border_width_bottom = 10
+border_color = Color(0.345098, 0.356863, 0.439216, 1)
+corner_radius_bottom_right = 16
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_p23ap"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_mdw0x"]
+
+[sub_resource type="Gradient" id="Gradient_ikhh5"]
+interpolation_mode = 1
+colors = PackedColorArray(1, 1, 1, 1, 0.5, 0.5, 0.5, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_vldnt"]
+gradient = SubResource("Gradient_ikhh5")
+width = 42
+height = 42
+fill = 2
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.940171, 0.282051)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_2v887"]
+
+[sub_resource type="Gradient" id="Gradient_5w4u5"]
+interpolation_mode = 1
+colors = PackedColorArray(1, 1, 1, 1, 0.5, 0.5, 0.5, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_7fw07"]
+gradient = SubResource("Gradient_5w4u5")
+width = 42
+height = 42
+fill = 2
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.940171, 0.282051)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_lwbjh"]
+
+[sub_resource type="Gradient" id="Gradient_dua0m"]
+interpolation_mode = 1
+colors = PackedColorArray(1, 1, 1, 1, 0.5, 0.5, 0.5, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_uk7dw"]
+gradient = SubResource("Gradient_dua0m")
+width = 42
+height = 42
+fill = 2
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.940171, 0.282051)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_nnkhp"]
+
+[sub_resource type="Gradient" id="Gradient_vvh3o"]
+interpolation_mode = 1
+colors = PackedColorArray(1, 1, 1, 1, 0.5, 0.5, 0.5, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_8eevj"]
+gradient = SubResource("Gradient_vvh3o")
+width = 42
+height = 42
+fill = 2
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.940171, 0.282051)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_nsk7x"]
+
+[sub_resource type="Gradient" id="Gradient_g2sdf"]
+interpolation_mode = 1
+colors = PackedColorArray(1, 1, 1, 1, 0.5, 0.5, 0.5, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_famyi"]
+gradient = SubResource("Gradient_g2sdf")
+width = 42
+height = 42
+fill = 2
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.940171, 0.282051)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_volkh"]
+atlas = ExtResource("21_h8cd0")
+region = Rect2(122, 135, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4en4h"]
+atlas = ExtResource("21_h8cd0")
+region = Rect2(10, 249, 100, 99)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_cny00"]
+atlas = ExtResource("21_h8cd0")
+region = Rect2(238, 249, 101, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nf5f0"]
+atlas = ExtResource("21_h8cd0")
+region = Rect2(124, 364, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_cmbj6"]
+atlas = ExtResource("21_h8cd0")
+region = Rect2(491, 355, 100, 100)
+
+[node name="Board" type="PanelContainer"]
+process_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_0y3cp")
+script = ExtResource("1_3ejk8")
+game_options = ExtResource("2_32hbf")
+music_list = Array[AudioStream]([ExtResource("3_sxty2"), ExtResource("4_d0ijk"), ExtResource("5_jphqe"), ExtResource("6_yf00c"), ExtResource("7_xkyde"), ExtResource("8_7cdry"), ExtResource("9_51lec"), ExtResource("10_d0vt7")])
+metadata/_edit_lock_ = true
+
+[node name="ColorRect" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_k63cm")
+layout_mode = 2
+mouse_filter = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_right = 5
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="Panel" type="Panel" parent="MarginContainer/VBoxContainer" groups=["mobile_controls"]]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_q5586")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 3
+alignment = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/VBoxContainer" groups=["mobile_controls"]]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="MobileMenu" type="HBoxContainer" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 2
+theme_override_constants/separation = 10
+
+[node name="HomeButton" type="TextureButton" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/MobileMenu"]
+process_mode = 3
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+texture_normal = ExtResource("12_vmaa7")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="PauseButton" type="TextureButton" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/MobileMenu"]
+unique_name_in_owner = true
+process_mode = 3
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+focus_mode = 0
+texture_normal = ExtResource("13_2ey8q")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="UndoButton" type="TextureButton" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/MobileMenu"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+focus_mode = 0
+texture_normal = ExtResource("14_sdphd")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="MusicControls" type="HBoxContainer" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_constants/separation = 40
+alignment = 1
+
+[node name="SkipPrevious" type="TextureButton" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/MusicControls"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+focus_mode = 0
+texture_normal = ExtResource("14_72628")
+texture_pressed = ExtResource("14_72628")
+texture_hover = ExtResource("14_72628")
+texture_disabled = ExtResource("14_72628")
+texture_focused = ExtResource("14_72628")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="PausePlay" type="TextureButton" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/MusicControls"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+focus_mode = 0
+texture_normal = ExtResource("15_nrt7v")
+texture_pressed = ExtResource("15_nrt7v")
+texture_hover = ExtResource("15_nrt7v")
+texture_disabled = ExtResource("15_nrt7v")
+texture_focused = ExtResource("15_nrt7v")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="SkipNext" type="TextureButton" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/MusicControls"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+focus_mode = 0
+texture_normal = ExtResource("16_d6vvd")
+texture_pressed = ExtResource("16_d6vvd")
+texture_hover = ExtResource("16_d6vvd")
+texture_disabled = ExtResource("16_d6vvd")
+texture_focused = ExtResource("16_d6vvd")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="MobileVSeparator" type="VSeparator" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 10
+theme_override_styles/separator = SubResource("StyleBoxEmpty_0tlm7")
+
+[node name="MarginContainer2" type="MarginContainer" parent="MarginContainer/VBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 2
+theme_override_constants/separation = 25
+alignment = 1
+
+[node name="MarginContainer2" type="MarginContainer" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_top = 58
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer2"]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
+theme_override_constants/separation = 80
+alignment = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer2/VBoxContainer2"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer2/VBoxContainer2/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer2/VBoxContainer2/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.803922, 0.839216, 0.956863, 1)
+theme_override_font_sizes/font_size = 48
+text = "HOLD"
+horizontal_alignment = 1
+
+[node name="PanelContainer" type="PanelContainer" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer2/VBoxContainer2/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_jqn22")
+
+[node name="HoldContainer" type="CenterContainer" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer2/VBoxContainer2/MarginContainer/VBoxContainer/PanelContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 75)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Control" type="Control" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer2/VBoxContainer2/MarginContainer/VBoxContainer/PanelContainer/HoldContainer"]
+layout_mode = 2
+
+[node name="HoldShape" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer2/VBoxContainer2/MarginContainer/VBoxContainer/PanelContainer/HoldContainer/Control" instance=ExtResource("17_icyxd")]
+unique_name_in_owner = true
+material = SubResource("ShaderMaterial_xkv06")
+scale = Vector2(0.5, 0.5)
+texture = SubResource("GradientTexture2D_mas8v")
+
+[node name="LeftInfo" type="VBoxContainer" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer2/VBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 80
+
+[node name="MarginContainer5" type="MarginContainer" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer2/VBoxContainer2/LeftInfo"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer2/VBoxContainer2/LeftInfo/MarginContainer5"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer2/VBoxContainer2/LeftInfo/MarginContainer5/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.803922, 0.839216, 0.956863, 1)
+theme_override_font_sizes/font_size = 48
+text = "TOP
+"
+horizontal_alignment = 1
+
+[node name="CenterContainer" type="CenterContainer" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer2/VBoxContainer2/LeftInfo/MarginContainer5/VBoxContainer"]
+layout_mode = 2
+
+[node name="LabelTop" type="Label" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer2/VBoxContainer2/LeftInfo/MarginContainer5/VBoxContainer/CenterContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "2000"
+
+[node name="MarginContainer2" type="MarginContainer" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer2/VBoxContainer2/LeftInfo"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer2/VBoxContainer2/LeftInfo/MarginContainer2"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer2/VBoxContainer2/LeftInfo/MarginContainer2/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.803922, 0.839216, 0.956863, 1)
+theme_override_font_sizes/font_size = 48
+text = "SCORE
+"
+horizontal_alignment = 1
+
+[node name="CenterContainer" type="CenterContainer" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer2/VBoxContainer2/LeftInfo/MarginContainer2/VBoxContainer"]
+layout_mode = 2
+
+[node name="LabelScore" type="Label" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer2/VBoxContainer2/LeftInfo/MarginContainer2/VBoxContainer/CenterContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "2000"
+
+[node name="MarginContainer3" type="MarginContainer" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer2/VBoxContainer2/LeftInfo"]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer2/VBoxContainer2/LeftInfo/MarginContainer3"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer2/VBoxContainer2/LeftInfo/MarginContainer3/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.803922, 0.839216, 0.956863, 1)
+theme_override_font_sizes/font_size = 48
+text = "LEVEL"
+horizontal_alignment = 1
+
+[node name="LabelLevel" type="Label" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer2/VBoxContainer2/LeftInfo/MarginContainer3/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.803922, 0.839216, 0.956863, 1)
+theme_override_font_sizes/font_size = 48
+text = "1"
+horizontal_alignment = 1
+
+[node name="MarginContainer4" type="MarginContainer" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer2/VBoxContainer2/LeftInfo"]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer2/VBoxContainer2/LeftInfo/MarginContainer4"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer2/VBoxContainer2/LeftInfo/MarginContainer4/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.803922, 0.839216, 0.956863, 1)
+theme_override_font_sizes/font_size = 48
+text = "LINES"
+horizontal_alignment = 1
+
+[node name="LinesLabel" type="Label" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer2/VBoxContainer2/LeftInfo/MarginContainer4/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.803922, 0.839216, 0.956863, 1)
+theme_override_font_sizes/font_size = 48
+text = "0"
+horizontal_alignment = 1
+
+[node name="Grid" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer" instance=ExtResource("18_1leos")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(640, 1408)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+debug_inital_piece = null
+metadata/_edit_group_ = true
+
+[node name="GridBorder" type="PanelContainer" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/Grid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(640, 1280)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 8
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_auo2c")
+
+[node name="CenterContainer" type="CenterContainer" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/Grid"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/Grid/CenterContainer"]
+layout_mode = 2
+
+[node name="ScreenMessage" type="Label" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/Grid/CenterContainer/VBoxContainer"]
+unique_name_in_owner = true
+z_index = 999
+layout_mode = 2
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_colors/font_outline_color = Color(0.498039, 0.517647, 0.611765, 1)
+theme_override_constants/outline_size = 5
+theme_override_constants/shadow_outline_size = 15
+theme_override_font_sizes/font_size = 54
+text = "TETRIS!"
+horizontal_alignment = 1
+
+[node name="ScreenSubMessage" type="Label" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/Grid/CenterContainer/VBoxContainer"]
+unique_name_in_owner = true
+z_index = 999
+layout_mode = 2
+theme_override_colors/font_color = Color(0.803922, 0.839216, 0.956863, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_colors/font_outline_color = Color(0.498039, 0.517647, 0.611765, 1)
+theme_override_constants/outline_size = 5
+theme_override_constants/shadow_outline_size = 15
+theme_override_font_sizes/font_size = 36
+text = "BACK 2 BACK"
+horizontal_alignment = 1
+
+[node name="GameOverScreen" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/Grid/CenterContainer" instance=ExtResource("19_s082q")]
+unique_name_in_owner = true
+visible = false
+z_index = 99
+layout_mode = 2
+
+[node name="PauseLabel" type="Label" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/Grid/CenterContainer" groups=["visible_when_paused"]]
+process_mode = 2
+visible = false
+z_index = 999
+layout_mode = 2
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_colors/font_outline_color = Color(0.498039, 0.517647, 0.611765, 1)
+theme_override_constants/outline_size = 5
+theme_override_constants/shadow_outline_size = 15
+theme_override_font_sizes/font_size = 54
+text = "PAUSED
+"
+horizontal_alignment = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_top = 58
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer"]
+custom_minimum_size = Vector2(110, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
+theme_override_constants/separation = 80
+alignment = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer/VBoxContainer/MarginContainer"]
+custom_minimum_size = Vector2(182, 0)
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.803922, 0.839216, 0.956863, 1)
+theme_override_font_sizes/font_size = 48
+text = "NEXT"
+horizontal_alignment = 1
+
+[node name="PanelContainer" type="PanelContainer" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_xyi2b")
+
+[node name="NextPiecesBox" type="VBoxContainer" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/PanelContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/PanelContainer/NextPiecesBox"]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+theme_override_styles/separator = SubResource("StyleBoxEmpty_p23ap")
+
+[node name="CenterContainer" type="CenterContainer" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/PanelContainer/NextPiecesBox"]
+custom_minimum_size = Vector2(0, 75)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Control" type="Control" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/PanelContainer/NextPiecesBox/CenterContainer"]
+layout_mode = 2
+
+[node name="NextShape" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/PanelContainer/NextPiecesBox/CenterContainer/Control" instance=ExtResource("17_icyxd")]
+material = SubResource("ShaderMaterial_mdw0x")
+scale = Vector2(0.5, 0.5)
+texture = SubResource("GradientTexture2D_vldnt")
+
+[node name="CenterContainer2" type="CenterContainer" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/PanelContainer/NextPiecesBox"]
+custom_minimum_size = Vector2(0, 75)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Control" type="Control" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/PanelContainer/NextPiecesBox/CenterContainer2"]
+layout_mode = 2
+
+[node name="NextShape2" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/PanelContainer/NextPiecesBox/CenterContainer2/Control" instance=ExtResource("17_icyxd")]
+material = SubResource("ShaderMaterial_2v887")
+scale = Vector2(0.5, 0.5)
+texture = SubResource("GradientTexture2D_7fw07")
+
+[node name="CenterContainer3" type="CenterContainer" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/PanelContainer/NextPiecesBox"]
+custom_minimum_size = Vector2(0, 75)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Control" type="Control" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/PanelContainer/NextPiecesBox/CenterContainer3"]
+layout_mode = 2
+
+[node name="NextShape3" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/PanelContainer/NextPiecesBox/CenterContainer3/Control" instance=ExtResource("17_icyxd")]
+material = SubResource("ShaderMaterial_lwbjh")
+scale = Vector2(0.5, 0.5)
+texture = SubResource("GradientTexture2D_uk7dw")
+
+[node name="CenterContainer4" type="CenterContainer" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/PanelContainer/NextPiecesBox"]
+custom_minimum_size = Vector2(0, 75)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Control" type="Control" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/PanelContainer/NextPiecesBox/CenterContainer4"]
+layout_mode = 2
+
+[node name="NextShape4" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/PanelContainer/NextPiecesBox/CenterContainer4/Control" instance=ExtResource("17_icyxd")]
+material = SubResource("ShaderMaterial_nnkhp")
+scale = Vector2(0.5, 0.5)
+texture = SubResource("GradientTexture2D_8eevj")
+
+[node name="CenterContainer5" type="CenterContainer" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/PanelContainer/NextPiecesBox"]
+custom_minimum_size = Vector2(0, 75)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Control" type="Control" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/PanelContainer/NextPiecesBox/CenterContainer5"]
+layout_mode = 2
+
+[node name="NextShape5" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/PanelContainer/NextPiecesBox/CenterContainer5/Control" instance=ExtResource("17_icyxd")]
+material = SubResource("ShaderMaterial_nsk7x")
+scale = Vector2(0.5, 0.5)
+texture = SubResource("GradientTexture2D_famyi")
+
+[node name="ComboContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer/VBoxContainer/ComboContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer/VBoxContainer/ComboContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.803922, 0.839216, 0.956863, 1)
+theme_override_font_sizes/font_size = 48
+text = "COMBO"
+horizontal_alignment = 1
+
+[node name="ComboLabel" type="Label" parent="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer/VBoxContainer/ComboContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.803922, 0.839216, 0.956863, 1)
+theme_override_font_sizes/font_size = 48
+text = "0"
+horizontal_alignment = 1
+
+[node name="HelpLabel" parent="MarginContainer/VBoxContainer/VBoxContainer" instance=ExtResource("21_kujky")]
+layout_mode = 2
+theme_override_constants/margin_bottom = 40
+
+[node name="PauseNode" type="Node" parent="."]
+process_mode = 2
+script = ExtResource("20_eq48s")
+
+[node name="BGMusic" type="AudioStreamPlayer" parent="."]
+volume_db = -20.0
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Control" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -540.0
+offset_right = 540.0
+grow_horizontal = 2
+grow_vertical = 0
+size_flags_vertical = 8
+
+[node name="MobileControls" type="Node2D" parent="CanvasLayer/Control" groups=["mobile_controls"]]
+unique_name_in_owner = true
+position = Vector2(-88, 141)
+scale = Vector2(1.5, 1.5)
+
+[node name="DirectionalButtons" type="Node2D" parent="CanvasLayer/Control/MobileControls"]
+position = Vector2(231.333, -288)
+
+[node name="UpButton" type="TouchScreenButton" parent="CanvasLayer/Control/MobileControls/DirectionalButtons"]
+position = Vector2(-11, -200)
+texture_normal = SubResource("AtlasTexture_volkh")
+texture_pressed = SubResource("AtlasTexture_volkh")
+
+[node name="LeftButton" type="TouchScreenButton" parent="CanvasLayer/Control/MobileControls/DirectionalButtons"]
+unique_name_in_owner = true
+position = Vector2(-123, -86)
+texture_normal = SubResource("AtlasTexture_4en4h")
+
+[node name="RightButton" type="TouchScreenButton" parent="CanvasLayer/Control/MobileControls/DirectionalButtons"]
+unique_name_in_owner = true
+position = Vector2(105, -86)
+texture_normal = SubResource("AtlasTexture_cny00")
+
+[node name="DownButton" type="TouchScreenButton" parent="CanvasLayer/Control/MobileControls/DirectionalButtons"]
+unique_name_in_owner = true
+position = Vector2(-9, 29)
+texture_normal = SubResource("AtlasTexture_nf5f0")
+
+[node name="ActionButtons" type="Node2D" parent="CanvasLayer/Control/MobileControls"]
+position = Vector2(866.667, -291.333)
+
+[node name="HardDropButton" type="TouchScreenButton" parent="CanvasLayer/Control/MobileControls/ActionButtons"]
+position = Vector2(-242, -148.667)
+texture_normal = SubResource("AtlasTexture_cmbj6")
+texture_pressed = SubResource("AtlasTexture_cmbj6")
+
+[node name="HoldButton" type="TouchScreenButton" parent="CanvasLayer/Control/MobileControls/ActionButtons"]
+position = Vector2(-242, -16)
+texture_normal = SubResource("AtlasTexture_cmbj6")
+texture_pressed = SubResource("AtlasTexture_cmbj6")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = ExtResource("22_4y5ig")
+
+[node name="DesktopMenu" type="MarginContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="HBoxContainer" type="HBoxContainer" parent="DesktopMenu"]
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="ExitButton" type="Button" parent="DesktopMenu/HBoxContainer"]
+process_mode = 3
+custom_minimum_size = Vector2(200, 100)
+layout_mode = 2
+focus_mode = 0
+theme_override_colors/font_color = Color(0.803922, 0.839216, 0.956863, 1)
+theme_override_font_sizes/font_size = 48
+text = "EXIT"
+
+[node name="PostScoreRequest" type="HTTPRequest" parent="."]
+script = ExtResource("24_6ivlf")
+
+[connection signal="pressed" from="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/MobileMenu/HomeButton" to="." method="_on_home_button_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/MobileMenu/PauseButton" to="." method="_on_pause_button_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/MobileMenu/UndoButton" to="." method="_on_undo_button_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/MusicControls/SkipPrevious" to="." method="_on_skip_previous_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/MusicControls/PausePlay" to="." method="_on_pause_play_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/MusicControls/SkipNext" to="." method="_on_skip_next_pressed"]
+[connection signal="can_swap_with_hold_changed" from="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/Grid" to="." method="_on_grid_can_swap_with_hold_changed"]
+[connection signal="combo_changed" from="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/Grid" to="." method="_on_grid_combo_changed"]
+[connection signal="game_over" from="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/Grid" to="." method="_on_grid_game_over"]
+[connection signal="highest_row_changed" from="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/Grid" to="." method="_on_grid_highest_row_changed"]
+[connection signal="hold_piece_changed" from="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/Grid" to="." method="_on_grid_hold_piece_changed"]
+[connection signal="level_changed" from="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/Grid" to="." method="_on_grid_level_changed"]
+[connection signal="next_shapes_queue_changed" from="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/Grid" to="." method="_on_grid_next_shapes_queue_changed"]
+[connection signal="piece_locked" from="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/Grid" to="." method="_on_grid_piece_locked"]
+[connection signal="score_changed" from="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/Grid" to="." method="_on_grid_score_changed"]
+[connection signal="total_lines_cleared_changed" from="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/Grid" to="." method="_on_grid_total_lines_cleared_changed"]
+[connection signal="hidden" from="MarginContainer/VBoxContainer/VBoxContainer/MarginContainer2/HBoxContainer/Grid/CenterContainer/GameOverScreen" to="." method="_on_game_over_screen_hidden"]
+[connection signal="finished" from="BGMusic" to="." method="_on_bg_music_finished"]
+[connection signal="pressed" from="CanvasLayer/Control/MobileControls/DirectionalButtons/UpButton" to="." method="_on_up_pressed"]
+[connection signal="pressed" from="CanvasLayer/Control/MobileControls/ActionButtons/HardDropButton" to="." method="_on_hard_drop_pressed"]
+[connection signal="pressed" from="CanvasLayer/Control/MobileControls/ActionButtons/HoldButton" to="." method="_on_hold_pressed"]
+[connection signal="pressed" from="DesktopMenu/HBoxContainer/ExitButton" to="." method="_on_exit_button_pressed"]

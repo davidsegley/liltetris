@@ -1,0 +1,44 @@
+[gd_scene load_steps=6 format=3 uid="uid://ch6trqkpc4ei3"]
+
+[sub_resource type="Gradient" id="Gradient_genpb"]
+interpolation_mode = 2
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_u5k2t"]
+gradient = SubResource("Gradient_genpb")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_odsjs"]
+particle_flag_disable_z = true
+emission_shape = 3
+emission_box_extents = Vector3(100, 1, 0)
+direction = Vector3(0, -1, 0)
+spread = 0.0
+initial_velocity_min = 560.0
+initial_velocity_max = 600.0
+gravity = Vector3(0, 0, 0)
+radial_accel_min = 100.0
+radial_accel_max = 100.0
+tangential_accel_max = 100.0
+scale_max = 2.0
+color_ramp = SubResource("GradientTexture1D_u5k2t")
+
+[sub_resource type="Gradient" id="Gradient_k50g4"]
+resource_local_to_scene = true
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_iafcg"]
+resource_local_to_scene = true
+gradient = SubResource("Gradient_k50g4")
+width = 10
+height = 22
+
+[node name="CPUParticles2D" type="GPUParticles2D"]
+emitting = false
+amount = 10
+process_material = SubResource("ParticleProcessMaterial_odsjs")
+texture = SubResource("GradientTexture2D_iafcg")
+lifetime = 0.5
+one_shot = true
+speed_scale = 1.2
+explosiveness = 0.75
+fixed_fps = 0

@@ -1,0 +1,58 @@
+[gd_scene load_steps=11 format=3 uid="uid://bn5oar86niqfy"]
+
+[ext_resource type="Script" path="res://shapes/shape.gd" id="1_mr1f6"]
+[ext_resource type="Shader" path="res://shaders/shape.gdshader" id="1_uy4vd"]
+[ext_resource type="Script" path="res://shapes/shapeRes.gd" id="2_xla2f"]
+[ext_resource type="PackedScene" uid="uid://ch6trqkpc4ei3" path="res://shapes/hard_drop_particles.tscn" id="3_q3brr"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_147o7"]
+resource_local_to_scene = true
+shader = ExtResource("1_uy4vd")
+shader_parameter/shine_color = Color(1, 1, 1, 0.25)
+shader_parameter/line_width = 0.1
+shader_parameter/angle = 0.785398
+shader_parameter/speed = 1.0
+shader_parameter/wait_cycles = 2.0
+
+[sub_resource type="Gradient" id="Gradient_dgq7f"]
+resource_local_to_scene = true
+interpolation_mode = 1
+offsets = PackedFloat32Array(0.454874, 0.801444, 1)
+colors = PackedColorArray(1, 1, 1, 1, 0.5, 0.5, 0.5, 1, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_3x4ft"]
+resource_local_to_scene = true
+gradient = SubResource("Gradient_dgq7f")
+fill = 2
+fill_from = Vector2(0.5, 0.5)
+
+[sub_resource type="Resource" id="Resource_ks86w"]
+script = ExtResource("2_xla2f")
+name = ""
+coords = Array[Vector2i]([])
+color = Color(1, 1, 1, 1)
+can_rotate = true
+
+[sub_resource type="Gradient" id="Gradient_en8tw"]
+resource_local_to_scene = true
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_paps8"]
+resource_local_to_scene = true
+gradient = SubResource("Gradient_en8tw")
+width = 10
+height = 22
+
+[node name="Shape" type="Sprite2D"]
+self_modulate = Color(1, 1, 1, 0)
+z_index = 1
+material = SubResource("ShaderMaterial_147o7")
+texture = SubResource("GradientTexture2D_3x4ft")
+script = ExtResource("1_mr1f6")
+res = SubResource("Resource_ks86w")
+
+[node name="HardDropParticles" parent="." instance=ExtResource("3_q3brr")]
+z_index = 999
+texture = SubResource("GradientTexture2D_paps8")
+
+[connection signal="finished" from="HardDropParticles" to="." method="_on_hard_drop_particles_finished"]

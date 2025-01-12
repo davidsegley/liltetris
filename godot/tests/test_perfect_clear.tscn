@@ -1,0 +1,49 @@
+[gd_scene load_steps=6 format=3 uid="uid://b14bgbphlmij5"]
+
+[ext_resource type="PackedScene" uid="uid://blg1aattuuky7" path="res://board/board.tscn" id="1_r51ka"]
+[ext_resource type="Script" path="res://shapes/shapeRes.gd" id="2_lt75o"]
+[ext_resource type="Resource" uid="uid://bp24x4qbg3dmu" path="res://shapes/I.tres" id="3_61nbn"]
+
+[sub_resource type="Shader" id="Shader_8mlbo"]
+code = "shader_type canvas_item;
+
+// --- Uniforms --- //
+uniform vec4 shine_color: source_color = vec4(1.0, 1.0, 1.0, 0.25);
+
+uniform float line_width: hint_range(0.0, 2.0, 0.01) = 0.1;
+uniform float angle: hint_range(0.0, 6.28318530718, 0.1308996939) = 0.785398163397;
+
+uniform float speed: hint_range(0.0, 10.0, 0.1) = 2.0;
+uniform float wait_cycles: hint_range(0.0, 10.0, 0.1) = 1.0;
+
+// --- Functions --- //
+vec2 rotate_precalculated(vec2 _pos, float _sine, float _cosine) {
+	return vec2(_pos.x * _cosine + _pos.y * -_sine, _pos.x * _sine + _pos.y * _cosine);
+}
+
+void fragment() {
+	float sine = sin(angle);
+	float cosine = cos(angle);
+	float len = 1.5 - max(abs(sine), abs(cosine)) + line_width;
+	float line = smoothstep(-line_width, line_width,
+			rotate_precalculated((UV - vec2(0.5)), sine, cosine).y - mod(TIME * speed, (len * 2.0) * wait_cycles) + len);
+	COLOR.rgb += shine_color.rgb * shine_color.a * vec3(line * (1.0 - line) * 4.0);
+}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_xkv06"]
+resource_local_to_scene = true
+shader = SubResource("Shader_8mlbo")
+shader_parameter/shine_color = Color(1, 1, 1, 0.25)
+shader_parameter/line_width = 0.1
+shader_parameter/angle = 0.785398
+shader_parameter/speed = 1.0
+shader_parameter/wait_cycles = 2.0
+
+[node name="Board" instance=ExtResource("1_r51ka")]
+
+[node name="HoldShape" parent="MarginContainer/VBoxContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/MarginContainer/VBoxContainer/PanelContainer/HoldContainer/Control" index="0"]
+material = SubResource("ShaderMaterial_xkv06")
+
+[node name="Grid" parent="MarginContainer/VBoxContainer/VBoxContainer/HBoxContainer" index="1"]
+shapes = Array[ExtResource("2_lt75o")]([ExtResource("3_61nbn"), ExtResource("3_61nbn"), ExtResource("3_61nbn"), ExtResource("3_61nbn"), ExtResource("3_61nbn"), ExtResource("3_61nbn"), ExtResource("3_61nbn")])

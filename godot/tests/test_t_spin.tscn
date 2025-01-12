@@ -1,0 +1,49 @@
+[gd_scene load_steps=5 format=3 uid="uid://tpdo1uidash1"]
+
+[ext_resource type="PackedScene" uid="uid://blg1aattuuky7" path="res://board/board.tscn" id="1_x0xhc"]
+[ext_resource type="Resource" uid="uid://bv1vg86tup2s2" path="res://shapes/T.tres" id="2_5dsoe"]
+
+[sub_resource type="Shader" id="Shader_8mlbo"]
+code = "shader_type canvas_item;
+
+// --- Uniforms --- //
+uniform vec4 shine_color: source_color = vec4(1.0, 1.0, 1.0, 0.25);
+
+uniform float line_width: hint_range(0.0, 2.0, 0.01) = 0.1;
+uniform float angle: hint_range(0.0, 6.28318530718, 0.1308996939) = 0.785398163397;
+
+uniform float speed: hint_range(0.0, 10.0, 0.1) = 2.0;
+uniform float wait_cycles: hint_range(0.0, 10.0, 0.1) = 1.0;
+
+// --- Functions --- //
+vec2 rotate_precalculated(vec2 _pos, float _sine, float _cosine) {
+	return vec2(_pos.x * _cosine + _pos.y * -_sine, _pos.x * _sine + _pos.y * _cosine);
+}
+
+void fragment() {
+	float sine = sin(angle);
+	float cosine = cos(angle);
+	float len = 1.5 - max(abs(sine), abs(cosine)) + line_width;
+	float line = smoothstep(-line_width, line_width,
+			rotate_precalculated((UV - vec2(0.5)), sine, cosine).y - mod(TIME * speed, (len * 2.0) * wait_cycles) + len);
+	COLOR.rgb += shine_color.rgb * shine_color.a * vec3(line * (1.0 - line) * 4.0);
+}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_xkv06"]
+resource_local_to_scene = true
+shader = SubResource("Shader_8mlbo")
+shader_parameter/shine_color = Color(1, 1, 1, 0.25)
+shader_parameter/line_width = 0.1
+shader_parameter/angle = 0.785398
+shader_parameter/speed = 1.0
+shader_parameter/wait_cycles = 2.0
+
+[node name="Board" instance=ExtResource("1_x0xhc")]
+
+[node name="HoldShape" parent="MarginContainer/VBoxContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/MarginContainer/VBoxContainer/PanelContainer/HoldContainer/Control" index="0"]
+material = SubResource("ShaderMaterial_xkv06")
+
+[node name="Grid" parent="MarginContainer/VBoxContainer/VBoxContainer/HBoxContainer" index="1"]
+debug_trash = Array[PackedVector2Array]([PackedVector2Array(0, 19, 1, 19, 2, 19, 3, 19, 4, 19, 3, 18, 6, 19, 7, 19, 8, 19, 9, 19, 6, 17, 7, 17, 7, 18, 8, 18), PackedVector2Array(0, 19, 1, 19, 2, 19, 3, 19, 4, 19, 5, 19, 6, 19, 7, 19, 8, 19, 0, 18, 1, 18, 2, 18, 3, 18, 4, 18, 8, 18, 9, 18, 4, 17, 5, 17, 8, 17, 9, 17, 9, 16), PackedVector2Array(0, 19, 1, 19, 2, 19, 3, 19, 4, 19, 5, 19, 6, 19, 9, 19, 0, 18, 1, 18, 2, 18, 3, 18, 4, 18, 5, 18, 6, 18, 9, 18, 0, 17, 1, 17, 2, 17, 3, 17, 4, 17, 5, 17, 6, 17, 7, 17, 9, 17, 9, 16, 9, 15, 8, 15, 7, 19), PackedVector2Array(0, 19, 1, 19, 2, 19, 3, 19, 4, 19, 5, 19, 7, 19, 8, 19, 9, 19, 0, 18, 1, 18, 2, 18, 3, 18, 4, 18, 8, 18, 9, 18, 7, 17)])
+debug_inital_piece = ExtResource("2_5dsoe")

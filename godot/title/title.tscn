@@ -1,0 +1,195 @@
+[gd_scene load_steps=16 format=3 uid="uid://dorj3pcg1ctcx"]
+
+[ext_resource type="Shader" path="res://shaders/animated_stripes.gdshader" id="1_luku8"]
+[ext_resource type="Script" path="res://title/title.gd" id="1_u6gpx"]
+[ext_resource type="Texture2D" uid="uid://c744xsvkx3ls3" path="res://assets/grid_view_24dp.svg" id="2_7o5r8"]
+[ext_resource type="Resource" uid="uid://dcnnj076coeqe" path="res://config/game_options.tres" id="2_ndxn7"]
+[ext_resource type="Texture2D" uid="uid://bvy7gf5mniqp1" path="res://assets/resume_24dp.svg" id="3_7vwn1"]
+[ext_resource type="Texture2D" uid="uid://d3dul3bf88ygq" path="res://assets/manufacturing_24dp.svg" id="4_u6t5r"]
+[ext_resource type="Texture2D" uid="uid://dax84aularid1" path="res://assets/icons/cubes.svg" id="5_lkdwd"]
+[ext_resource type="Environment" uid="uid://v45qr82w2byq" path="res://default_enviroment.tres" id="6_lqic3"]
+[ext_resource type="Texture2D" uid="uid://fae1otm76by4" path="res://assets/icons/falling-leaf.svg" id="7_ef1xs"]
+[ext_resource type="PackedScene" uid="uid://n0kkh0tsnf8g" path="res://ui/status_bar.tscn" id="8_g027m"]
+[ext_resource type="PackedScene" uid="uid://pfolyk5uu1c7" path="res://ui/top_scores_table.tscn" id="9_23kkc"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0y3cp"]
+bg_color = Color(0.0941176, 0.0941176, 0.145098, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_rn2dk"]
+shader = ExtResource("1_luku8")
+shader_parameter/color_gap = Color(0.25, 0.25, 0.25, 0.25)
+shader_parameter/color_stripe = Color(0.192157, 0.196078, 0.266667, 1)
+shader_parameter/divisions = 8.0
+shader_parameter/stripe_bias = 2.5
+shader_parameter/speed = 0.02
+shader_parameter/angle = 0.7854
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_t7ctj"]
+content_margin_left = 5.0
+content_margin_top = 5.0
+content_margin_right = 10.0
+content_margin_bottom = 5.0
+bg_color = Color(0.117647, 0.117647, 0.180392, 1)
+border_width_left = 10
+border_width_top = 10
+border_width_right = 10
+border_width_bottom = 10
+border_color = Color(0.803922, 0.839216, 0.956863, 0.270588)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_isb5v"]
+content_margin_left = 5.0
+content_margin_top = 5.0
+content_margin_right = 10.0
+content_margin_bottom = 5.0
+bg_color = Color(0.117647, 0.117647, 0.180392, 1)
+border_color = Color(0.370037, 0.370638, 0.494542, 1)
+border_blend = true
+
+[node name="Title" type="PanelContainer"]
+process_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_0y3cp")
+script = ExtResource("1_u6gpx")
+game_options = ExtResource("2_ndxn7")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_rn2dk")
+layout_mode = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="NewGameMenu" type="HBoxContainer" parent="CenterContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 35
+
+[node name="NormalMode" type="Button" parent="CenterContainer/NewGameMenu"]
+custom_minimum_size = Vector2(400, 450)
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 48
+theme_override_styles/focus = SubResource("StyleBoxFlat_t7ctj")
+theme_override_styles/hover = SubResource("StyleBoxFlat_isb5v")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_isb5v")
+theme_override_styles/normal = SubResource("StyleBoxFlat_isb5v")
+text = "NORMAL
+"
+icon = ExtResource("5_lkdwd")
+icon_alignment = 1
+vertical_icon_alignment = 0
+expand_icon = true
+
+[node name="ZenMode" type="Button" parent="CenterContainer/NewGameMenu"]
+custom_minimum_size = Vector2(400, 450)
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+theme_override_styles/focus = SubResource("StyleBoxFlat_t7ctj")
+theme_override_styles/hover = SubResource("StyleBoxFlat_isb5v")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_isb5v")
+theme_override_styles/normal = SubResource("StyleBoxFlat_isb5v")
+text = "ZEN
+"
+icon = ExtResource("7_ef1xs")
+icon_alignment = 1
+vertical_icon_alignment = 0
+expand_icon = true
+
+[node name="Menu" type="VBoxContainer" parent="CenterContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/separation = 40
+alignment = 1
+
+[node name="NewGameButton" type="Button" parent="CenterContainer/Menu"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 86
+theme_override_styles/focus = SubResource("StyleBoxFlat_t7ctj")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_isb5v")
+theme_override_styles/hover = SubResource("StyleBoxFlat_isb5v")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_isb5v")
+theme_override_styles/normal = SubResource("StyleBoxFlat_isb5v")
+text = "NEW GAME"
+icon = ExtResource("2_7o5r8")
+alignment = 0
+
+[node name="ContinueButton" type="Button" parent="CenterContainer/Menu"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 86
+theme_override_styles/focus = SubResource("StyleBoxFlat_t7ctj")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_isb5v")
+theme_override_styles/hover = SubResource("StyleBoxFlat_isb5v")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_isb5v")
+theme_override_styles/normal = SubResource("StyleBoxFlat_isb5v")
+text = "CONTINUE"
+icon = ExtResource("3_7vwn1")
+alignment = 0
+
+[node name="OptionsButton" type="Button" parent="CenterContainer/Menu"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 86
+theme_override_styles/focus = SubResource("StyleBoxFlat_isb5v")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_isb5v")
+theme_override_styles/hover = SubResource("StyleBoxFlat_isb5v")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_isb5v")
+theme_override_styles/normal = SubResource("StyleBoxFlat_isb5v")
+text = "OPTIONS"
+icon = ExtResource("4_u6t5r")
+alignment = 0
+
+[node name="StatusBar" parent="." instance=ExtResource("8_g027m")]
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+
+[node name="TopScoresTable" parent="Control" instance=ExtResource("9_23kkc")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 1000)
+layout_mode = 1
+anchors_preset = 0
+anchor_top = 0.0
+anchor_bottom = 0.0
+offset_left = 180.0
+offset_top = -500.0
+offset_right = 956.0
+offset_bottom = 500.0
+grow_vertical = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = ExtResource("6_lqic3")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VersionLabel" type="Label" parent="MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 8
+theme_override_font_sizes/font_size = 48
+text = "1.0"
+
+[connection signal="pressed" from="CenterContainer/NewGameMenu/NormalMode" to="." method="_on_normal_mode_pressed"]
+[connection signal="pressed" from="CenterContainer/NewGameMenu/ZenMode" to="." method="_on_zen_mode_pressed"]
+[connection signal="pressed" from="CenterContainer/Menu/NewGameButton" to="." method="_on_new_game_button_pressed"]
+[connection signal="pressed" from="CenterContainer/Menu/ContinueButton" to="." method="_on_continue_button_pressed"]

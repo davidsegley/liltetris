@@ -1,0 +1,47 @@
+[gd_scene load_steps=5 format=3 uid="uid://n0kkh0tsnf8g"]
+
+[ext_resource type="Script" path="res://ui/status_bar.gd" id="1_txnhn"]
+[ext_resource type="Texture2D" uid="uid://m6fc3k33ho27" path="res://assets/cheems.png" id="2_eqe8p"]
+[ext_resource type="Texture2D" uid="uid://cnjv17kqsbhrs" path="res://assets/icons/undo_24dp.svg" id="2_modmc"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5ddeq"]
+bg_color = Color(0.141176, 0.152941, 0.227451, 0)
+
+[node name="StatusBar" type="PanelContainer"]
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_5ddeq")
+script = ExtResource("1_txnhn")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 10
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="BackButton" type="Button" parent="MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(160, 140)
+layout_mode = 2
+icon = ExtResource("2_modmc")
+flat = true
+expand_icon = true
+
+[node name="UserButton" type="Button" parent="MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(400, 120)
+layout_mode = 2
+size_flags_horizontal = 10
+theme_override_colors/font_color = Color(0.803922, 0.839216, 0.956863, 1)
+theme_override_constants/icon_max_width = 150
+theme_override_font_sizes/font_size = 48
+text = "USERNAME"
+icon = ExtResource("2_eqe8p")
+flat = true
+alignment = 2
+icon_alignment = 2
+
+[connection signal="pressed" from="MarginContainer/HBoxContainer/BackButton" to="." method="_on_back_button_pressed"]

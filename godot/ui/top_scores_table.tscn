@@ -1,0 +1,75 @@
+[gd_scene load_steps=4 format=3 uid="uid://pfolyk5uu1c7"]
+
+[ext_resource type="Script" path="res://ui/top_scores_table.gd" id="1_s62d4"]
+[ext_resource type="PackedScene" uid="uid://d4hjedro4npcf" path="res://ui/top_score_label.tscn" id="3_vmetw"]
+[ext_resource type="Script" path="res://http_client/api_request.gd" id="5_k6dg0"]
+
+[node name="TopScoresTable" type="PanelContainer"]
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_top = -138.5
+offset_right = 684.0
+offset_bottom = 138.5
+grow_vertical = 2
+script = ExtResource("1_s62d4")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_top = 40
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 40
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="Title" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "CHADS"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="GridContainer" type="GridContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/h_separation = 50
+theme_override_constants/v_separation = 20
+columns = 3
+
+[node name="Label" parent="MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("3_vmetw")]
+layout_mode = 2
+text = "1"
+
+[node name="Label2" parent="MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("3_vmetw")]
+layout_mode = 2
+text = "STARB"
+
+[node name="Label3" parent="MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("3_vmetw")]
+layout_mode = 2
+text = "10000"
+
+[node name="Label4" parent="MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("3_vmetw")]
+layout_mode = 2
+text = "2"
+
+[node name="Label5" parent="MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("3_vmetw")]
+layout_mode = 2
+text = "sdlfkjssdf"
+
+[node name="Label6" parent="MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("3_vmetw")]
+layout_mode = 2
+text = "1231231231"
+
+[node name="ScoresRequest" type="HTTPRequest" parent="."]
+script = ExtResource("5_k6dg0")
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 5.0
+
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

@@ -1,0 +1,22 @@
+[gd_resource type="Theme" load_steps=2 format=3 uid="uid://ddxewwfljdivl"]
+
+[ext_resource type="FontFile" uid="uid://ctjjwel6q6f7u" path="res://assets/aldrich_regular.ttf" id="2_eeogo"]
+
+[resource]
+/colors/blue = Color(0.537255, 0.705882, 0.980392, 1)
+/colors/green = Color(0.65098, 0.890196, 0.631373, 1)
+/colors/mauve = Color(0.796078, 0.65098, 0.968627, 1)
+/colors/peach = Color(0.980392, 0.701961, 0.529412, 1)
+/colors/red = Color(0.952941, 0.545098, 0.658824, 1)
+/colors/sky = Color(0.537255, 0.862745, 0.921569, 1)
+/colors/surface0 = Color(0.192157, 0.196078, 0.266667, 1)
+/colors/surface1 = Color(0.270588, 0.278431, 0.352941, 1)
+/colors/surface2 = Color(0.345098, 0.356863, 0.439216, 1)
+/colors/text = Color(0.803922, 0.839216, 0.956863, 1)
+/colors/yellow = Color(0.976471, 0.886275, 0.686275, 1)
+Button/colors/font_color = Color(0.803922, 0.839216, 0.956863, 1)
+Button/fonts/font = ExtResource("2_eeogo")
+Fonts/fonts/large = ExtResource("2_eeogo")
+Fonts/fonts/normal = ExtResource("2_eeogo")
+Label/colors/font_color = Color(0.803922, 0.839216, 0.956863, 1)
+Label/fonts/font = ExtResource("2_eeogo")

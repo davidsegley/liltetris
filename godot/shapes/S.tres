@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ShapeRes" load_steps=2 format=3 uid="uid://cjahce4mybtbl"]
+
+[ext_resource type="Script" path="res://shapes/shapeRes.gd" id="1_urcs1"]
+
+[resource]
+script = ExtResource("1_urcs1")
+name = "S"
+coords = Array[Vector2i]([Vector2i(0, -1), Vector2i(1, -1), Vector2i(-1, 0)])
+color = Color(0.764706, 0.909804, 0.552941, 1)
+can_rotate = true

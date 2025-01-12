@@ -1,0 +1,126 @@
+[gd_scene load_steps=3 format=3 uid="uid://bdnr8o3m1tg4e"]
+
+[ext_resource type="Script" path="res://ui/game_over_screen.gd" id="1_3jcsb"]
+[ext_resource type="Texture2D" uid="uid://d1dub681imc0y" path="res://assets/refresh_24dp.svg" id="2_n3yn6"]
+
+[node name="GameOverScreen" type="VBoxContainer"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -159.5
+offset_top = -158.5
+offset_right = 159.5
+offset_bottom = 158.5
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+script = ExtResource("1_3jcsb")
+
+[node name="Title" type="Label" parent="."]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.803922, 0.839216, 0.956863, 1)
+theme_override_font_sizes/font_size = 72
+text = "GAME OVER"
+horizontal_alignment = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_top = 30
+theme_override_constants/margin_bottom = 40
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 40
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 40
+alignment = 1
+
+[node name="VBoxContainer3" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer3"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "TETRISES"
+horizontal_alignment = 1
+
+[node name="TetrisesLabel" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer3"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "10"
+horizontal_alignment = 1
+
+[node name="VBoxContainer1" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer1"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "COMBO"
+horizontal_alignment = 1
+
+[node name="MxComboLabel" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer1"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "10"
+horizontal_alignment = 1
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "B2B"
+horizontal_alignment = 1
+
+[node name="MxB2BLabel" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "10"
+horizontal_alignment = 1
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 40
+alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+alignment = 1
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer2/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "T-SPINS"
+horizontal_alignment = 1
+
+[node name="TSpinsLabel" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer2/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "10"
+horizontal_alignment = 1
+
+[node name="ReloadButton" type="TextureButton" parent="."]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture_normal = ExtResource("2_n3yn6")
+texture_pressed = ExtResource("2_n3yn6")
+texture_hover = ExtResource("2_n3yn6")
+texture_disabled = ExtResource("2_n3yn6")
+texture_focused = ExtResource("2_n3yn6")
+
+[connection signal="pressed" from="ReloadButton" to="." method="_on_texture_button_pressed"]

@@ -1,0 +1,85 @@
+[gd_scene load_steps=7 format=3 uid="uid://drl34wq25i61m"]
+
+[ext_resource type="Script" path="res://ui/help_label.gd" id="1_0esh1"]
+[ext_resource type="FontFile" uid="uid://cnlwpw35il637" path="res://assets/comic_cup.otf" id="1_teqxl"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_pk48v"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_rcgow"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_4uopb"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_x1otl"]
+
+[node name="HelpLabel" type="MarginContainer"]
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 31.0
+grow_horizontal = 2
+script = ExtResource("1_0esh1")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 40
+alignment = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 48
+alignment = 1
+
+[node name="Label3" type="Label" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("1_teqxl")
+theme_override_font_sizes/font_size = 48
+theme_override_styles/normal = SubResource("StyleBoxEmpty_pk48v")
+text = "Esc = Pause
+"
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("1_teqxl")
+theme_override_font_sizes/font_size = 48
+theme_override_styles/normal = SubResource("StyleBoxEmpty_pk48v")
+text = "Up = Rotate Clockwise
+"
+
+[node name="Label2" type="Label" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("1_teqxl")
+theme_override_font_sizes/font_size = 48
+theme_override_styles/normal = SubResource("StyleBoxEmpty_rcgow")
+text = "Z = Rotate"
+
+[node name="Label5" type="Label" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("1_teqxl")
+theme_override_font_sizes/font_size = 48
+theme_override_styles/normal = SubResource("StyleBoxEmpty_4uopb")
+text = "Arrows = Move"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 48
+alignment = 1
+
+[node name="Label6" type="Label" parent="VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("1_teqxl")
+theme_override_font_sizes/font_size = 48
+theme_override_styles/normal = SubResource("StyleBoxEmpty_4uopb")
+text = " Space = Drop"
+
+[node name="Label3" type="Label" parent="VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("1_teqxl")
+theme_override_font_sizes/font_size = 48
+theme_override_styles/normal = SubResource("StyleBoxEmpty_x1otl")
+text = "C = Hold Piece"
+
+[node name="Undo" type="Label" parent="VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("1_teqxl")
+theme_override_font_sizes/font_size = 48
+theme_override_styles/normal = SubResource("StyleBoxEmpty_4uopb")
+text = "Ctrl+Z = Undo"

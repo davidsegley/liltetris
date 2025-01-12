@@ -1,0 +1,49 @@
+[gd_scene load_steps=4 format=3 uid="uid://c5i8npxpt0n8f"]
+
+[ext_resource type="Script" path="res://login/form_username.gd" id="1_nf5o2"]
+[ext_resource type="Resource" uid="uid://d16gj1pkh7n1v" path="res://login/login_state.tres" id="2_ytfro"]
+[ext_resource type="FontFile" uid="uid://ctjjwel6q6f7u" path="res://assets/aldrich_regular.ttf" id="4_qjk7f"]
+
+[node name="EnterUsername" type="MarginContainer"]
+offset_right = 1078.0
+offset_bottom = 368.0
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+script = ExtResource("1_nf5o2")
+state = ExtResource("2_ytfro")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 15
+alignment = 1
+
+[node name="Label" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 80
+text = "WELCOME!"
+
+[node name="Label2" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Enter a username"
+
+[node name="UsernameField" type="LineEdit" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.803922, 0.839216, 0.956863, 1)
+theme_override_fonts/font = ExtResource("4_qjk7f")
+theme_override_font_sizes/font_size = 64
+placeholder_text = "USERNAME"
+max_length = 20
+context_menu_enabled = false
+caret_blink = true
+
+[node name="JoinButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_qjk7f")
+theme_override_font_sizes/font_size = 80
+text = "JOIN"
+
+[connection signal="text_submitted" from="VBoxContainer/UsernameField" to="." method="_on_username_field_text_submitted"]
+[connection signal="pressed" from="VBoxContainer/JoinButton" to="." method="_on_join_button_pressed"]

@@ -1,0 +1,6 @@
+[gd_resource type="Resource" script_class="LoginState" load_steps=2 format=3 uid="uid://d16gj1pkh7n1v"]
+
+[ext_resource type="Script" path="res://login/login_state.gd" id="1_enfn4"]
+
+[resource]
+script = ExtResource("1_enfn4")

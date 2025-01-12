@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ShapeRes" load_steps=2 format=3 uid="uid://dus40mqqm6ylu"]
+
+[ext_resource type="Script" path="res://shapes/shapeRes.gd" id="1_yvl2h"]
+
+[resource]
+script = ExtResource("1_yvl2h")
+name = "L"
+coords = Array[Vector2i]([Vector2i(-1, 0), Vector2i(1, 0), Vector2i(-1, -1)])
+color = Color(0.54902, 0.666667, 0.933333, 1)
+can_rotate = true

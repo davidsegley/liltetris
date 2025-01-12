@@ -1,0 +1,47 @@
+[gd_scene load_steps=12 format=3 uid="uid://cc263q64lwo6o"]
+
+[ext_resource type="Script" path="res://board/grid.gd" id="1_hptdh"]
+[ext_resource type="Resource" uid="uid://bv1vg86tup2s2" path="res://shapes/T.tres" id="2_uuqfb"]
+[ext_resource type="Resource" uid="uid://dus40mqqm6ylu" path="res://shapes/L.tres" id="3_fp1vl"]
+[ext_resource type="Script" path="res://shapes/shapeRes.gd" id="3_fumg6"]
+[ext_resource type="Resource" uid="uid://bp24x4qbg3dmu" path="res://shapes/I.tres" id="4_1t032"]
+[ext_resource type="Resource" uid="uid://bqg44qdfltrn3" path="res://shapes/O.tres" id="5_c2jv1"]
+[ext_resource type="Resource" uid="uid://bdc7vxe477fh8" path="res://shapes/Z.tres" id="6_2alym"]
+[ext_resource type="Resource" uid="uid://bsgvmvl6hmmrd" path="res://shapes/J.tres" id="7_1k7oh"]
+[ext_resource type="AudioStream" uid="uid://brwi4a3pbgntp" path="res://assets/SE/ui-button-click-snap.wav" id="8_661i4"]
+[ext_resource type="Resource" uid="uid://cjahce4mybtbl" path="res://shapes/S.tres" id="8_sl3pp"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ferc2"]
+
+[node name="Grid" type="PanelContainer"]
+custom_minimum_size = Vector2(440, 880)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = -440.0
+offset_right = 220.0
+offset_bottom = 440.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_ferc2")
+script = ExtResource("1_hptdh")
+debug_inital_piece = ExtResource("2_uuqfb")
+shapes = Array[ExtResource("3_fumg6")]([ExtResource("3_fp1vl"), ExtResource("4_1t032"), ExtResource("2_uuqfb"), ExtResource("5_c2jv1"), ExtResource("6_2alym"), ExtResource("7_1k7oh"), ExtResource("8_sl3pp")])
+block_size = Vector2(64, 64)
+rows = 22
+show_grid = true
+
+[node name="GravityTimer" type="Timer" parent="."]
+
+[node name="LockdownTimer" type="Timer" parent="."]
+wait_time = 0.5
+one_shot = true
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("8_661i4")
+volume_db = 5.0
+
+[connection signal="timeout" from="LockdownTimer" to="." method="_on_lockdown_timer_timeout" flags=3]
